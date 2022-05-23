@@ -22,14 +22,14 @@ def create_WAV(input_text):
     dictionary_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/dic'
 
     
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_normal.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_bashful.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_angry.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_happy.htsvoice'
-    voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_sad.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/H-09.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/雪音ルウ２.htsvoice'
-    # voice_path = 'C:/Users/hapit/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/風音桜凪.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_normal.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_bashful.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_angry.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_happy.htsvoice'
+    voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/mei/mei_sad.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/H-09.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/雪音ルウ２.htsvoice'
+    # voice_path = '~/Documents/practice/chinko-talk/open_jtalk-1.11/bin/othervoice/風音桜凪.htsvoice'
 
     voice_speed = '0.9'
 
