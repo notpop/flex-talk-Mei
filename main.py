@@ -2,7 +2,7 @@ from discord.ext import commands
 from config import DISCORD_SERIAL_KEY
 from bot.bot_commands import setup_commands
 
-client = commands.Bot(command_prefix='flex.')
+client = commands.Bot(command_prefix='f.')
 
 @client.event
 async def on_ready():
