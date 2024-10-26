@@ -50,6 +50,10 @@ def setup_commands(client):
         print(f"Context: {context}")
         print(f"Guild: {context.guild}")
 
+        permissions = context.guild.me.guild_permissions
+        print(f"Can connect to voice: {permissions.connect}")
+        print(f"Can speak in voice: {permissions.speak}")
+
         if not context.author.voice:
             await context.send("You need to be in a voice channel first!")
             return
@@ -76,16 +80,23 @@ def setup_commands(client):
 
             # 新規接続（エラーハンドリングを細分化）
             print("=== Starting connection process ===")
+            if context.voice_client:
+                print("Disconnecting previous voice client.")
+                await context.voice_client.disconnect()
+
             try:
-                print("Attempting new connection...")
+                print("Attempting to connect to the voice channel...")
                 voice_client = await voice_channel.connect(timeout=20.0, reconnect=True)
-                print("Connection method completed")
-            except Exception as connect_error:
-                print(f"Error during connect(): {connect_error}")
-                import traceback
-                print(f"Connect error traceback:\n{traceback.format_exc()}")
-                await context.send(f"Connection error: {str(connect_error)}")
-                return
+                print(f"Connection to voice channel {voice_channel.name} successful.")
+            except discord.ClientException as e:
+                print(f"ClientException during connection: {e}")
+                await context.send(f"Connection failed: {e}")
+            except asyncio.TimeoutError:
+                print("Connection timed out.")
+                await context.send("Connection attempt timed out.")
+            except Exception as e:
+                print(f"Unexpected error during connection: {e}")
+                await context.send(f"Unexpected error: {e}")
 
             try:
                 print("=== Checking voice client properties ===")
@@ -123,18 +134,16 @@ def setup_commands(client):
                 else:
                     # 接続確立の待機
                     retry_count = 0
-                    while retry_count < 5:
-                        try:
-                            if voice_client.is_connected():
-                                print(f"Connection verified on attempt {retry_count + 1}")
-                                await context.send(f"Successfully connected to {voice_channel.name}!")
-                                return
-                            print(f"Waiting for connection... Attempt {retry_count + 1}")
-                            await asyncio.sleep(1)
-                            retry_count += 1
-                        except Exception as e:
-                            print(f"Error during connection verification attempt {retry_count + 1}: {e}")
-                            retry_count += 1
+                    while retry_count < 10:  # 最大10回まで再試行
+                        if voice_client.is_connected():
+                            print("Connection successful.")
+                            break
+                        await asyncio.sleep(2)  # 2秒待機
+                        retry_count += 1
+
+                    if not voice_client.is_connected():
+                        await context.send("Failed to establish a stable connection after retries.")
+                        await voice_client.disconnect()  # 再接続失敗時の切断処理
 
                     print("Failed to verify connection after all attempts")
                     await context.send("Failed to establish a stable connection.")
