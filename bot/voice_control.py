@@ -22,15 +22,16 @@ def list_available_voices():
     return voices
 
 async def play_voice(text, voice_client):
-    if use_voicebox:
-        await play_voice_with_voicebox(text, voice_client)
-    else:
-        input_text = urlAbb(remove_custom_emoji(text))
-        create_WAV(input_text)
-        audio_source = discord.FFmpegPCMAudio("output.wav")
-
-        if not voice_client.is_playing():
+    if voice_client is not None and voice_client.is_connected():  # Noneチェックと接続確認
+        if use_voicebox:
+            await play_voice_with_voicebox(text)
+        else:
+            input_text = urlAbb(remove_custom_emoji(text))
+            create_WAV(input_text)
+            audio_source = discord.FFmpegPCMAudio("output.wav")
             voice_client.play(audio_source)
+    else:
+        print("Voice client is not connected or does not exist.")
 
 def create_WAV(input_text):
     dictionary_path = '/usr/share/open_jtalk/dic'

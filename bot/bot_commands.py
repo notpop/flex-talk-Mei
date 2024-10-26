@@ -10,14 +10,23 @@ def setup_commands(client):
     async def join(context):
         global voice_client, current_text_channel
 
+        # ボットが既にボイスチャンネルに接続しているか確認
+        if context.voice_client is not None:
+            await context.send("I'm already in a voice channel.")
+            return
+
         voice_channel = context.author.voice.channel
         current_text_channel = context.channel  # joinしたテキストチャンネルを記憶
-        voice_client = await voice_channel.connect()
+        voice_client = await voice_channel.connect()  # ここでvoice_clientを更新
 
-        await context.send(f"Joined {voice_channel.name} and will read messages from {current_text_channel.name}")
-
-        # ボイスチャンネルの状態を監視し、定期的に確認する
-        check_voice_channel.start()
+         # ここで接続状態を確認
+        if voice_client.is_connected():
+            print(f"Successfully connected to {voice_channel.name}")
+            await context.send(f"Joined {voice_channel.name} and will read messages from {current_text_channel.name}")
+            check_voice_channel.start()
+        else:
+            print("Failed to connect to voice channel.")
+            await context.send("Failed to join the voice channel.")
 
     @client.command()
     async def bye(context):
@@ -25,7 +34,7 @@ def setup_commands(client):
 
         if context.voice_client:
             await context.voice_client.disconnect()
-            voice_client = None
+            voice_client = None  # ここでvoice_clientをNoneに設定
             current_text_channel = None
             check_voice_channel.stop()
             await context.send("Disconnected from voice channel.")
@@ -56,8 +65,27 @@ def setup_commands(client):
             return
 
         # joinしたテキストチャンネルのメッセージだけを読み上げる
-        if message.channel == current_text_channel and message.guild.voice_client:
-            await play_voice(message.content)
+        if message.channel == current_text_channel:
+            voice_client = message.guild.voice_client  # ボイスクライアントを取得
+            # ボイスクライアントの状態を確認
+            if voice_client:
+                if voice_client.is_connected():
+                    print("Connected to voice channel:", voice_client.channel.name)
+                    await play_voice(message.content, voice_client)
+                else:
+                    print("Voice client exists but is not connected.")
+                    await current_text_channel.send("I'm connected to the voice client but not in a voice channel.")
+            else:
+                print("No voice client found.")
+                await current_text_channel.send("I'm not connected to any voice channel.")
+
+    @client.command()
+    async def status(context):
+        voice_client = context.guild.voice_client
+        if voice_client and voice_client.is_connected():
+            await context.send(f"I'm connected to {voice_client.channel.name}.")
+        else:
+            await context.send("I'm not connected to any voice channel.")
 
     @tasks.loop(seconds=10)
     async def check_voice_channel():
