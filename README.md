@@ -39,6 +39,7 @@ $ task run
 `.env` ファイルの内容
 ```ini
 DISCORD_SERIAL_KEY=YOUR_DISCORD_BOT_KEY
+DISCORD_APPLICATION_ID=YOUR_DISCORD_BOT_ID # 必須じゃない
 VOICEBOX_API_KEY=YOUR_VOICEBOX_API_KEY  # VOICEBOXを使用しない場合は設定不要
 VOICE_DIRECTORY=/path/to/voices  # サーバー上に配置したOpen JTalkの音声ファイルのパス
 ```

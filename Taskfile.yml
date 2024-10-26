@@ -1,6 +1,10 @@
 version: '3'
 
 tasks:
+  default:
+    cmds:
+      - task: run
+
   setup:
     desc: "初回セットアップ: 必要な依存関係をインストールし、環境を整備します"
     cmds:
@@ -24,7 +28,7 @@ tasks:
   create_virtualenv:
     desc: "Pythonの仮想環境を作成します"
     cmds:
-      - if [ ! -d "venv" ]; then python3 -m venv venv; fi
+      - if [ ! -d "venv" ]; then python3.11 -m venv venv; fi
 
   activate_virtualenv:
     desc: "Python仮想環境を有効化します"
@@ -40,7 +44,7 @@ tasks:
     desc: "ボットを実行します"
     cmds:
       - task: activate_virtualenv
-      - python3 main.py
+      - python3.11 main.py
 
   clean:
     desc: "クリーンアップ: 一時ファイルと.envを削除します"
