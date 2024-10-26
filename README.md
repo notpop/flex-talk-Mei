@@ -45,6 +45,7 @@ macOSでのインストール方法
 ```bash
 $ brew install ffmpeg
 $ brew install open-jtalk
+$ brew install open-jtalk-mecab-naist-jdic
 ```
 6. 環境変数の設定
 環境変数を管理するための `.env` ファイルをプロジェクトルートに作成します。以下の内容を記述してください。
