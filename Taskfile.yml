@@ -1,0 +1,41 @@
+version: '3'
+
+tasks:
+  # setup:
+  #   desc: Setup flex-talk-mei bot and install dependencies
+  #   cmds:
+  #     - task: install_python
+  #     - task: install_dependencies
+  #     - task: setup_env
+  #     - task: initialize_config
+
+  # install_python:
+  #   desc: Install Python via Homebrew
+  #   cmds:
+  #     - ./setup/install-python.sh
+
+  # install_dependencies:
+  #   desc: Install Python packages from requirements.txt
+  #   cmds:
+  #     - pip3 install -r requirements.txt
+
+  # setup_env:
+  #   desc: Create .env file from example template
+  #   cmds:
+  #     - cp .env.example .env
+
+  # initialize_config:
+  #   desc: Initialize bot configurations and directories
+  #   cmds:
+  #     - ./setup/init-config.sh
+
+  run:
+    desc: Run the bot
+    cmds:
+      - python3 main.py
+
+  clean:
+    desc: Remove .env and cleanup directories
+    cmds:
+      - rm -f .env
+      - find . -name '__pycache__' -exec rm -rf {} +
