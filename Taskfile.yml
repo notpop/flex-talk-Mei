@@ -1,41 +1,50 @@
 version: '3'
 
 tasks:
-  # setup:
-  #   desc: Setup flex-talk-mei bot and install dependencies
-  #   cmds:
-  #     - task: install_python
-  #     - task: install_dependencies
-  #     - task: setup_env
-  #     - task: initialize_config
+  setup:
+    desc: "初回セットアップ: 必要な依存関係をインストールし、環境を整備します"
+    cmds:
+      - task: create_env_file
+      - task: install_dependencies
+      - task: create_virtualenv
+      - task: activate_virtualenv
+      - task: install_python_dependencies
 
-  # install_python:
-  #   desc: Install Python via Homebrew
-  #   cmds:
-  #     - ./setup/install-python.sh
+  create_env_file:
+    desc: ".envファイルを作成します"
+    cmds:
+      - if [ ! -f .env ]; then cp .env.example .env; fi
 
-  # install_dependencies:
-  #   desc: Install Python packages from requirements.txt
-  #   cmds:
-  #     - pip3 install -r requirements.txt
+  install_dependencies:
+    desc: "FFmpegとOpen JTalkをインストールします"
+    cmds:
+      - if [[ "$OSTYPE" == "darwin"* ]]; then brew install ffmpeg open-jtalk; fi
+      - if [[ "$OSTYPE" == "linux-gnu"* ]]; then sudo apt-get update && sudo apt-get install -y ffmpeg open-jtalk open-jtalk-mecab-naist-jdic; fi
 
-  # setup_env:
-  #   desc: Create .env file from example template
-  #   cmds:
-  #     - cp .env.example .env
+  create_virtualenv:
+    desc: "Pythonの仮想環境を作成します"
+    cmds:
+      - if [ ! -d "venv" ]; then python3 -m venv venv; fi
 
-  # initialize_config:
-  #   desc: Initialize bot configurations and directories
-  #   cmds:
-  #     - ./setup/init-config.sh
+  activate_virtualenv:
+    desc: "Python仮想環境を有効化します"
+    cmds:
+      - source venv/bin/activate  # Windowsでは venv\\Scripts\\activate を使用
+
+  install_python_dependencies:
+    desc: "Python依存パッケージをインストールします"
+    cmds:
+      - pip install -r requirements.txt
 
   run:
-    desc: Run the bot
+    desc: "ボットを実行します"
     cmds:
+      - task: activate_virtualenv
       - python3 main.py
 
   clean:
-    desc: Remove .env and cleanup directories
+    desc: "クリーンアップ: 一時ファイルと.envを削除します"
     cmds:
       - rm -f .env
       - find . -name '__pycache__' -exec rm -rf {} +
+      - rm -rf venv

@@ -10,43 +10,30 @@
 - Discord API トークン
 - （オプション）VOICEBOX API キー: VOICEBOX API を使用する場合
 ## セットアップ手順
-1. taskのinstall
+1. **Task のインストール**
+Taskを使用してセットアップを自動化するため、まず`go-task`をインストールします。
 ```bash
 $ brew install go-task/tap/go-task
 ```
-2. リポジトリのクローン
+
+2. **リポジトリのクローン**
 まず、プロジェクトをクローンしてディレクトリに移動します。
 ```bash
 $ git clone https://github.com/notpop/flex-talk-Mei.git
 $ cd flex-talk-Mei
 ```
-3. Python 仮想環境の作成 (推奨)
-Python の仮想環境を作成し、プロジェクトで必要な依存関係を隔離します。
+3. **プロジェクトのセットアップ**
+以下のコマンドで、必要な依存関係を自動的にインストールし、Python仮想環境を作成します。また、.envファイルも自動的に生成されます。
+```bash
+$ task setup
+```
+4. **ボットの起動**
+```bash
+$ task run
+```
+ボットが正常に起動すると、Discord サーバー上でメッセージを読み上げるためのコマンドが利用できるようになります。
 
-```bash
-$ python3 -m venv venv
-$ source venv/bin/activate  # Windowsの場合は venv\Scripts\activate
-```
-4. 必要なパッケージのインストール
-requirements.txt に記載されている依存パッケージをインストールします。
-
-```bash
-$ pip install -r requirements.txt
-```
-5. FFmpeg と Open JTalk のインストール
-Ubuntuでのインストール方法
-```bash
-$ sudo apt update
-$ sudo apt install ffmpeg
-$ sudo apt install open-jtalk
-$ sudo apt install open-jtalk-mecab-naist-jdic
-```
-macOSでのインストール方法
-```bash
-$ brew install ffmpeg
-$ brew install open-jtalk
-```
-6. 環境変数の設定
+## 環境変数の設定
 環境変数を管理するための `.env` ファイルをプロジェクトルートに作成します。以下の内容を記述してください。
 
 `.env` ファイルの内容
@@ -58,16 +45,6 @@ VOICE_DIRECTORY=/path/to/voices  # サーバー上に配置したOpen JTalkの�
 - DISCORD_SERIAL_KEY: Discord API のボットトークンです。Discordの開発者ポータルで取得できます。
 - VOICEBOX_API_KEY: VOICEBOX API を使用する場合に必要です。VOICEBOX APIを使わない場合は、この項目を削除または空欄にしておいても問題ありません。
 - VOICE_DIRECTORY: Open JTalkの .htsvoice ファイルを格納しているディレクトリへのパスを指定します。
-7. 音声ファイルの配置
-サーバー上に Open JTalk 用の .htsvoice ファイルを用意し、VOICE_DIRECTORY で指定したディレクトリに配置します。プロジェクトにはいくつかの音声ファイルがデフォルトで含まれているので、それらを使用することもできます。
-
-8. ボットの起動
-設定が完了したら、以下のコマンドでボットを起動します。
-
-```bash
-$ python main.py
-```
-ボットが正常に起動すると、Discord サーバー上でメッセージを読み上げるためのコマンドが利用できるようになります。
 
 ## コマンド一覧
 ### ボイスチャンネル関連
@@ -86,6 +63,9 @@ $ python main.py
 
 ### 自動読み上げ
 ボイスチャンネルにボットが接続されている間、サーバー内のテキストメッセージは自動的に音声に変換され、ボイスチャンネル内で再生されます。カスタム絵文字やURLは除外されます。
+
+## 参考
+- 辞書は[ここから](https://sourceforge.net/projects/open-jtalk/)ダウンロード
 
 ## 注意事項
 - VOICEBOX APIを使用する場合
