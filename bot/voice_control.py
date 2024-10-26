@@ -1,14 +1,13 @@
 import os
 import discord
 import subprocess
-import shutil  # ディレクトリ削除用
+import shutil
 from config import VOICE_DIRECTORY, DEFAULT_VOICE_PATH, VOICEBOX_API_KEY
 from utils.text_processing import remove_custom_emoji, urlAbb
 
 voice_path = DEFAULT_VOICE_PATH
-temp_dir = "./temp"  # 一時ファイルを保存するディレクトリ
+temp_dir = "./temp"
 
-# 一時ファイルディレクトリを作成
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
 
@@ -36,7 +35,7 @@ async def play_voice(text, voice_client):
             raise FileNotFoundError(f"{wav_file_path}が作成されませんでした。")
 
         audio_source = discord.FFmpegPCMAudio(wav_file_path, options={'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'})
-        voice_client.play(audio_source, after=lambda e: cleanup_temp_files())  # 再生後にクリーンアップ
+        voice_client.play(audio_source, after=lambda e: cleanup_temp_files())
 
     except Exception as e:
         print(f"音声再生中にエラーが発生しました: {e}")
