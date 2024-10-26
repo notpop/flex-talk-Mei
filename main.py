@@ -1,20 +1,16 @@
 from discord.ext import commands
-import discord  # discord.Intentsを使用するために必要
+import discord
 from config import DISCORD_SERIAL_KEY
 from bot.bot_commands import setup_commands
 
-# Intentsを設定する
+# Intentsの設定
 intents = discord.Intents.default()
-intents.message_content = True  # メッセージの内容にアクセスするためのintent
+intents.message_content = True
 
-# ボットの初期化（intentsを指定）
+# ボットの初期化
 client = commands.Bot(command_prefix='f.', intents=intents)
 
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user.name} ({client.user.id})')
-
-# コマンドの設定
+# コマンドとイベントハンドラの設定
 setup_commands(client)
 
 # ボットを起動

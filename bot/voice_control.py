@@ -1,80 +1,53 @@
 import os
 import discord
 import subprocess
-import requests
 import shutil  # ディレクトリ削除用
 from config import VOICE_DIRECTORY, DEFAULT_VOICE_PATH, VOICEBOX_API_KEY
 from utils.text_processing import remove_custom_emoji, urlAbb
 
 voice_path = DEFAULT_VOICE_PATH
-use_voicebox = False
 temp_dir = "./temp"  # 一時ファイルを保存するディレクトリ
 
-# 一時ファイルディレクトリを作成する
+# 一時ファイルディレクトリを作成
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
 
 def change_voice_path(voice_name):
-    global voice_path, use_voicebox
-    if voice_name == 'voicebox':
-        use_voicebox = True
-    else:
-        use_voicebox = False
-        voice_path = os.path.join(VOICE_DIRECTORY, f'{voice_name}.htsvoice')
+    """音声ファイルのパスを変更"""
+    global voice_path
+    voice_path = os.path.join(VOICE_DIRECTORY, f'{voice_name}.htsvoice') if voice_name != 'voicebox' else None
 
 def list_available_voices():
+    """利用可能な音声ファイルをリストアップ"""
     voices = [f.replace('.htsvoice', '') for f in os.listdir(VOICE_DIRECTORY) if f.endswith('.htsvoice')]
-    voices.append('voicebox')  # VOICEBOXもリストに追加
+    voices.append('voicebox')
     return voices
 
 async def play_voice(text, voice_client):
-    print(f"Starting play_voice with text: {text}")
-
-    if not voice_client:
-        print("Voice client is None")
-        raise ValueError("Voice client is not provided")
-
-    if not voice_client.is_connected():
-        print("Voice client is not connected")
-        raise discord.ClientException("Voice client is not connected")
-
+    """音声を再生"""
     try:
-        print("Creating WAV file...")
+        if not voice_client or not voice_client.is_connected():
+            raise discord.ClientException("ボイスチャンネルに接続されていません。")
+
         input_text = urlAbb(remove_custom_emoji(text))
         wav_file_path = create_WAV(input_text)
 
-        print("Checking if WAV file exists...")
         if not os.path.exists(wav_file_path):
-            raise FileNotFoundError(f"WAV file was not created at {wav_file_path}")
+            raise FileNotFoundError(f"{wav_file_path}が作成されませんでした。")
 
-        print("Creating audio source...")
-        audio_source = discord.FFmpegPCMAudio(
-            wav_file_path,
-            # FFmpegのオプションを追加
-            options={
-                'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-                'options': '-vn'
-            }
-        )
-
-        print("Playing audio...")
-        voice_client.play(
-            audio_source,
-            after=lambda e: cleanup_temp_files()  # 再生後に一時ファイルを削除
-        )
-        print(f"Playing voice: {text}")
+        audio_source = discord.FFmpegPCMAudio(wav_file_path, options={'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'})
+        voice_client.play(audio_source, after=lambda e: cleanup_temp_files())  # 再生後にクリーンアップ
 
     except Exception as e:
-        print(f"Error in play_voice: {e}")
-        import traceback
-        print(f"Traceback: {traceback.format_exc()}")
+        print(f"音声再生中にエラーが発生しました: {e}")
         raise
 
 def create_WAV(input_text):
+    """WAVファイルを作成"""
     try:
         dictionary_path = './dic'
         voice_speed = '0.9'
-        output_file_name = os.path.join(temp_dir, 'output.wav')  # 一時ファイルディレクトリに出力
+        output_file_name = os.path.join(temp_dir, 'output.wav')
 
         input_file_name = os.path.join(temp_dir, 'input.txt')
         with open(input_file_name, 'w', encoding='utf-8') as file:
@@ -83,34 +56,17 @@ def create_WAV(input_text):
         command = f'open_jtalk -x {dictionary_path} -m {voice_path} -r {voice_speed} -ow {output_file_name} {input_file_name}'
         subprocess.run(command, shell=True, check=True)
 
-        return output_file_name  # WAVファイルのパスを返す
+        return output_file_name
 
-    except Exception as e:
-        print(f"Error in create_WAV: {e}")
-        raise
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"WAVファイルの作成に失敗しました: {e}")
 
 def cleanup_temp_files():
-    """一時ファイルディレクトリを削除する"""
+    """一時ファイルを削除"""
     try:
         if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)  # ディレクトリごと削除
-            os.makedirs(temp_dir)  # 一時ファイルディレクトリを再作成
-        print("Temporary files cleaned up.")
+            shutil.rmtree(temp_dir)
+            os.makedirs(temp_dir)
+        print("一時ファイルをクリーンアップしました。")
     except Exception as e:
-        print(f"Error during cleanup: {e}")
-
-async def play_voice_with_voicebox(text, voice_client):
-    url = "https://api.voicebox.com/v1/synthesize"
-    headers = {"Authorization": f"Bearer {VOICEBOX_API_KEY}"}
-    data = {"text": text, "voice": "default_voice"}
-
-    response = requests.post(url, headers=headers, json=data)
-
-    if response.status_code == 200:
-        output_file_name = os.path.join(temp_dir, 'output.wav')  # 一時ファイルディレクトリに出力
-        with open(output_file_name, 'wb') as f:
-            f.write(response.content)
-        audio_source = discord.FFmpegPCMAudio(output_file_name)
-        voice_client.play(audio_source, after=lambda e: cleanup_temp_files())  # 再生後に一時ファイルを削除
-    else:
-        print(f"VOICEBOX API error: {response.status_code}")
+        print(f"一時ファイルの削除中にエラーが発生しました: {e}")
