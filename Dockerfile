@@ -3,21 +3,26 @@ FROM python:3.11-slim
 
 # 必要なパッケージのインストール
 RUN apt-get update && \
-    apt-get install -y ffmpeg open-jtalk && \
+    apt-get install -y git ffmpeg open-jtalk curl && \
     rm -rf /var/lib/apt/lists/*
+
+# go-taskのインストール
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
+# Taskをシステム全体で使えるように /usr/local/bin に移動
+RUN mv ./bin/task /usr/local/bin/task
 
 # 作業ディレクトリを作成
 WORKDIR /app
 
 # リポジトリをクローン
-RUN apt-get install -y git
 RUN git clone https://github.com/notpop/flex-talk-Mei.git /app
 
-# Pythonの依存パッケージをインストール
-RUN pip install --no-cache-dir -r requirements.txt
+# Taskfileの確認 (確認用コマンドを追加)
+RUN ls /app/Taskfile.yml
 
-# 環境セットアップ
-RUN task setup
+# Docker用のセットアップを実行
+RUN task docker-setup
 
 # ボットを実行
 CMD ["task", "run"]
