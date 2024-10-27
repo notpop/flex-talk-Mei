@@ -14,12 +14,6 @@ tasks:
       - task: activate_virtualenv
       - task: install_python_dependencies
 
-  docker-setup:
-    desc: "Docker環境用のセットアップ"
-    cmds:
-      - task: create_env_file
-      - task: install_python_dependencies
-
   create_env_file:
     desc: ".envファイルを作成します"
     cmds:
