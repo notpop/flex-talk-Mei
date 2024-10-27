@@ -57,3 +57,8 @@ tasks:
     desc: "docker buildの実行"
     cmds:
       - docker build --no-cache -t notpop/flex-talk-mei .
+
+  multi-build:
+    desc: "docker build and push for multi arch."
+    cmds:
+      - docker buildx build --platform linux/amd64,linux/arm64 -t notpop/flex-talk-mei-multi-arch --push .

@@ -5,7 +5,6 @@ FROM python:3.11-slim AS build
 RUN apt-get update && \
     apt-get install -y git ffmpeg open-jtalk curl && \
     rm -rf /var/lib/apt/lists/* && \
-    # 作業ディレクトリを作成しリポジトリをクローン
     mkdir /app && cd /app && \
     git clone https://github.com/notpop/flex-talk-Mei.git . && \
     # Python依存パッケージのインストール
@@ -19,7 +18,8 @@ RUN apt-get update && \
     apt-get install -y ffmpeg open-jtalk && \
     rm -rf /var/lib/apt/lists/*
 
-# 第一段階から必要なファイルをコピー
+# ビルドステージからPythonパッケージを含むディレクトリをコピー
+COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=build /app /app
 
 # 作業ディレクトリを設定
