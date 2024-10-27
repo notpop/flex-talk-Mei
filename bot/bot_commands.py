@@ -40,28 +40,29 @@ def setup_commands(client):
     @client.event
     async def on_message(message):
         """メッセージ受信時のイベント"""
-        # コマンドを処理
-        await client.process_commands(message)
-
         # ボット自身のメッセージは無視
         if message.author == client.user:
             return
+
+        # ボットがボイスチャンネルに接続していない場合は何もしない
+        voice_client = message.guild.voice_client
+        if not voice_client or not voice_client.is_connected():
+            return
+
+        # コマンドを処理
+        await client.process_commands(message)
 
         # メッセージがコマンドでない場合、音声を再生
         if message.content.startswith('f.'):
             return
 
-        voice_client = message.guild.voice_client
-        if voice_client and voice_client.is_connected():
-            try:
-                if voice_client.is_playing():
-                    voice_client.stop()
-                await play_voice(message.content, voice_client)
-            except Exception as e:
-                await message.channel.send("音声の再生中にエラーが発生しました。")
-                print(f"Error playing voice: {e}")
-        else:
-            await message.channel.send("ボイスチャンネルに接続されていません。")
+        try:
+            if voice_client.is_playing():
+                voice_client.stop()
+            await play_voice(message.content, voice_client)
+        except Exception as e:
+            await message.channel.send("音声の再生中にエラーが発生しました。")
+            print(f"Error playing voice: {e}")
 
     @client.command()
     async def check_environment(context):
