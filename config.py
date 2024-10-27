@@ -1,4 +1,8 @@
 import os
+# from dotenv import load_dotenv
+
+# # 環境変数の読み込み
+# load_dotenv()
 
 # 環境変数を取得する関数
 def get_env_variable(name, default_value=None):
