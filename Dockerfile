@@ -14,14 +14,13 @@ RUN apt-get update && \
 # 第二段階：最小限のランタイム環境
 FROM python:3.11-slim
 
-# 必要なパッケージのインストール、第一段階から必要なファイルのコピー、不要ファイルの削除を1つのRUNで実行
+# 必要なパッケージのインストールを実行
 RUN apt-get update && \
     apt-get install -y ffmpeg open-jtalk && \
-    rm -rf /var/lib/apt/lists/* && \
-    # 第一段階から必要なファイルをコピー
-    COPY --from=build /app /app && \
-    # 不要なキャッシュファイルを削除
-    find /usr/local/lib/python3.11/site-packages -name '__pycache__' -exec rm -rf {} + || true
+    rm -rf /var/lib/apt/lists/*
+
+# 第一段階から必要なファイルをコピー
+COPY --from=build /app /app
 
 # 作業ディレクトリを設定
 WORKDIR /app
