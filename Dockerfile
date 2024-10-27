@@ -7,20 +7,20 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir /app && \
     git clone https://github.com/notpop/flex-talk-Mei.git /app && \
-    # Python依存パッケージのインストール
     pip install --no-cache-dir -r /app/requirements.txt
 
 # 第二段階：distrolessの最小限のランタイム環境
-FROM python:3.11-slim
+FROM gcr.io/distroless/python3-debian12
 
-# ビルドステージから必要なファイルをすべて一度にコピー
+# 必要なファイルをすべて一度にコピー
 COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=build /app /app
 COPY --from=build /usr/bin/ffmpeg /usr/bin/ffmpeg
 COPY --from=build /usr/bin/open_jtalk /usr/bin/open_jtalk
+COPY --from=build /usr/lib/aarch64-linux-gnu/libHTSEngine.so.1 /usr/lib/aarch64-linux-gnu/libHTSEngine.so.1
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
 # ボットを実行
-CMD ["python3", "main.py"]
+CMD ["main.py"]
