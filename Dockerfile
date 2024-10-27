@@ -18,9 +18,6 @@ WORKDIR /app
 # リポジトリをクローン
 RUN git clone https://github.com/notpop/flex-talk-Mei.git /app
 
-# Taskfileの確認 (確認用コマンドを追加)
-RUN ls /app/Taskfile.yml
-
 # Docker用のセットアップを実行
 RUN task docker-setup
 
